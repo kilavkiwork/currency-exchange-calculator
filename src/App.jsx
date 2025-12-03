@@ -17,8 +17,8 @@ function App() {
       try {
         const rsp = await fetch(`${API_URL}/latest`);
         const data = await rsp.json();
-        setCurrencies([...Object.keys(data.rates), "EUR"].toSorted());
-        console.log(currencies);
+        const currenciesList = [...Object.keys(data.rates), "EUR"].sort();
+        setCurrencies(currenciesList);
       } catch {
         setError("Failed to fetch currencies");
       }

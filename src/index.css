@@ -87,6 +87,7 @@ h1 {
 }
 
 .result {
-  font-size: 18px;
+  font-size: 1.61rem;
+  font-weight: 600;
   color: #388e3c;
 }
