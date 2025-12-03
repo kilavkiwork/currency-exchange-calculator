@@ -4,9 +4,9 @@ import "./index.css";
 const API_URL = "https://api.frankfurter.dev/v1";
 
 function App() {
-  const [currencies, setCurrencies] = useState([]);
-  const [fromCurrency, setFromCurrency] = useState("EUR");
-  const [toCurrency, setToCurrency] = useState("AUD");
+  const [currencies, setCurrencies] = useState(["EUR"]);
+  const [fromCurrency, setFromCurrency] = useState(currencies);
+  const [toCurrency, setToCurrency] = useState(currencies);
   const [amount, setAmount] = useState(1);
   const [convertAmount, setConvertAmount] = useState(null);
   const [error, setError] = useState(null);
@@ -32,10 +32,6 @@ function App() {
       return;
     }
 
-    // if (fromCurrency === toCurrency) {
-    //   setError("From currency must not be equal to To currency");
-    //   return;
-    // }
     if (fromCurrency === toCurrency) {
       setConvertAmount(1);
       return;
