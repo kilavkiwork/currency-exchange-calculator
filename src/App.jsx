@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./index.css";
 
 const API_URL = "https://api.frankfurter.dev/v1";
@@ -6,26 +6,56 @@ const API_URL = "https://api.frankfurter.dev/v1";
 function App() {
   const [currencies, setCurrencies] = useState([]);
   const [fromCurrency, setFromCurrency] = useState("EUR");
-  const [toCurrency, setToCurrency] = useState("EUR");
+  const [toCurrency, setToCurrency] = useState("AUD");
   const [amount, setAmount] = useState(1);
   const [convertAmount, setConvertAmount] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoadings] = useState(false);
 
   useEffect(() => {
     async function getCurrencies() {
-      const rsp = await fetch(`${API_URL}/latest`);
-      const data = await rsp.json();
-      console.log(data);
-      setCurrencies(Object.keys(data.rates));
+      try {
+        const rsp = await fetch(`${API_URL}/latest`);
+        const data = await rsp.json();
+        setCurrencies([...Object.keys(data.rates), "EUR"].toSorted());
+        console.log(currencies);
+      } catch {
+        setError("Failed to fetch currencies");
+      }
     }
     getCurrencies();
   }, []);
 
   async function handleConvert() {
-    const result = await fetch(
-      `${API_URL}/latest?amount=${amount}&base=${fromCurrency}&symbols=${toCurrency}`
-    );
-    const data = await result.json();
-    setConvertAmount(data.rates[toCurrency]);
+    if (!amount || amount <= 0) {
+      setError("Amount must be greater than zero");
+      return;
+    }
+
+    // if (fromCurrency === toCurrency) {
+    //   setError("From currency must not be equal to To currency");
+    //   return;
+    // }
+    if (fromCurrency === toCurrency) {
+      setConvertAmount(1);
+      return;
+    }
+
+    setError(null);
+    setIsLoadings(true);
+
+    try {
+      const result = await fetch(
+        `${API_URL}/latest?amount=${amount}&base=${fromCurrency}&symbols=${toCurrency}`
+      );
+      const data = await result.json();
+      console.log(data);
+      setConvertAmount(data.rates[toCurrency]);
+    } catch {
+      setError("Failed to convert currencies");
+    } finally {
+      setIsLoadings(false);
+    }
   }
   //
   return (
@@ -33,7 +63,7 @@ function App() {
       <h1>Currency Exchange Calculator</h1>
 
       <div className="converter-container">
-        <p className="error"></p>
+        {error && <p className="error">{error}</p>}
 
         <div className="input-group">
           <input
@@ -71,9 +101,13 @@ function App() {
         <button onClick={handleConvert} className="convert-button">
           Convert
         </button>
-        <p className="loading">Converting...</p>
+        {isLoading && <p className="loading">Converting...</p>}
 
-        <p className="result">{convertAmount}</p>
+        {convertAmount !== null && !isLoading && (
+          <p className="result">
+            {amount} {fromCurrency} = {convertAmount.toFixed(2)} {toCurrency}
+          </p>
+        )}
       </div>
     </div>
   );
