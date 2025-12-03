@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 
-const API_URL = "https://api.frankfurter.app/";
+const API_URL = "https://api.frankfurter.dev/";
 
 function App() {
   return (
